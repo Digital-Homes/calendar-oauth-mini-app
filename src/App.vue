@@ -34,7 +34,7 @@ const refreshToken = ref('');
 // Function to extract tokens from the URL after Google redirects back
 const extractTokenFromUrl = () => {
   const urlParams = new URLSearchParams(window.location.search);
-  const authorizationCode = urlParams.get('code');
+  const authorizationCode: string | null = urlParams.get('code');
 
   if (authorizationCode) {
     console.log('Authorization Code:', authorizationCode);
@@ -44,7 +44,7 @@ const extractTokenFromUrl = () => {
 };
 
 // Function to exchange the authorization code for access and refresh tokens
-const exchangeCodeForTokens = async (authorizationCode) => {
+const exchangeCodeForTokens = async (authorizationCode: string) => {
   try {
     const response = await axios.post('https://oauth2.googleapis.com/token', {
       code: authorizationCode,
@@ -69,7 +69,7 @@ const exchangeCodeForTokens = async (authorizationCode) => {
 };
 
 // Function to fetch the user's email using the Google UserInfo API
-const fetchUserEmail = async (accessTokenVal) => {
+const fetchUserEmail = async (accessTokenVal: string) => {
   try {
     const response = await axios.get(
       'https://www.googleapis.com/oauth2/v1/userinfo?alt=json',
@@ -80,7 +80,7 @@ const fetchUserEmail = async (accessTokenVal) => {
       }
     );
 
-    const userEmail = response.data.email;
+    const userEmail: string = response.data.email;
     console.log('User Email:', userEmail);
 
     // Ensure the tokens are valid before storing them in Airtable
@@ -102,7 +102,11 @@ const fetchUserEmail = async (accessTokenVal) => {
 };
 
 // Function to store tokens and email in Airtable
-const storeTokensInAirtable = async (email, accessToken, refreshToken) => {
+const storeTokensInAirtable = async (
+  email: string,
+  accessToken: string,
+  refreshToken: string
+) => {
   const airtableBaseId = 'appnlATCpTLD0eA42';
   const airtableTableName = 'Calendar Data';
   const airtableToken =
