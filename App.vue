@@ -21,23 +21,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from 'vue';
-import axios from 'axios';
+import { ref, onMounted } from "vue";
+import axios from "axios";
 
 // Add your Google OAuth credentials here
 const clientId =
-  '200822425571-mfp431gnt4emg4007g507pf139vig9ie.apps.googleusercontent.com';
+  "200822425571-mfp431gnt4emg4007g507pf139vig9ie.apps.googleusercontent.com";
 const redirectUri = `${window.location.origin}/connect-google-calendar`;
-const accessToken = ref('');
-const refreshToken = ref('');
+const accessToken = ref("");
+const refreshToken = ref("");
 
 // Function to extract tokens from the URL after Google redirects back
 const extractTokenFromUrl = () => {
   const urlParams = new URLSearchParams(window.location.search);
-  const authorizationCode = urlParams.get('code');
+  const authorizationCode = urlParams.get("code");
 
   if (authorizationCode) {
-    console.log('Authorization Code:', authorizationCode);
+    console.log("Authorization Code:", authorizationCode);
     // Exchange the authorization code for access and refresh tokens
     exchangeCodeForTokens(authorizationCode);
   }
@@ -46,25 +46,27 @@ const extractTokenFromUrl = () => {
 // Function to exchange the authorization code for access and refresh tokens
 const exchangeCodeForTokens = async (authorizationCode) => {
   try {
-    const response = await axios.post('https://oauth2.googleapis.com/token', {
+    const response = await axios.post("https://oauth2.googleapis.com/token", {
       code: authorizationCode,
       client_id: clientId,
-      client_secret: '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',
+      client_secret: "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",
       redirect_uri: redirectUri,
-      grant_type: 'authorization_code',
+      grant_type: "authorization_code",
     });
 
-    // Make sure to set the tokens correctly
-    accessToken.value = response.data.access_token || '';
-    refreshToken.value = response.data.refresh_token || '';
+    console.log("Token Response:", response.data);
 
-    console.log('Access Token:', accessToken.value);
-    console.log('Refresh Token:', refreshToken.value);
+    // Make sure to set the tokens correctly
+    accessToken.value = response.data.access_token || "";
+    refreshToken.value = response.data.refresh_token || "";
+
+    console.log("Access Token:", accessToken.value);
+    console.log("Refresh Token:", refreshToken.value);
 
     // Fetch the user's email and then store the tokens and email in Airtable
     fetchUserEmail(accessToken.value);
   } catch (error) {
-    console.error('Error exchanging code for tokens:', error);
+    console.error("Error exchanging code for tokens:", error);
   }
 };
 
@@ -72,7 +74,7 @@ const exchangeCodeForTokens = async (authorizationCode) => {
 const fetchUserEmail = async (accessTokenVal) => {
   try {
     const response = await axios.get(
-      'https://www.googleapis.com/oauth2/v1/userinfo?alt=json',
+      "https://www.googleapis.com/oauth2/v1/userinfo?alt=json",
       {
         headers: {
           Authorization: `Bearer ${accessTokenVal}`,
@@ -81,11 +83,11 @@ const fetchUserEmail = async (accessTokenVal) => {
     );
 
     const userEmail = response.data.email;
-    console.log('User Email:', userEmail);
+    console.log("User Email:", userEmail);
 
     // Ensure the tokens are valid before storing them in Airtable
     if (accessToken.value && refreshToken.value) {
-      console.log('Storing tokens in Airtable...');
+      console.log("Storing tokens in Airtable...");
 
       // Call the function to store tokens in Airtable
       storeTokensInAirtable(
@@ -94,21 +96,21 @@ const fetchUserEmail = async (accessTokenVal) => {
         refreshToken.value // Refresh token
       );
     } else {
-      console.error('Tokens are missing or undefined');
+      console.error("Tokens are missing or undefined");
     }
   } catch (error) {
-    console.error('Error fetching user email:', error);
+    console.error("Error fetching user email:", error);
   }
 };
 
 // Function to store tokens and email in Airtable
 const storeTokensInAirtable = async (email, accessToken, refreshToken) => {
-  const airtableBaseId = 'appnlATCpTLD0eA42';
-  const airtableTableName = 'Calendar Data';
-  const airtableToken =
-    'patqQ7CqYQ7x5cAFZ.78dd41590a05303b075c28b56ddd817e2d7470cb2825cd87e6f0b0bfff1e0e53';
+  const airtableBaseId = import.meta.VITE_AIRTABLE_BASE_ID;
+  ("");
+  const airtableTableName = import.meta.VITE_TABLE_ID; // calendar data table
+  const airtableToken = import.meta.VITE_AIRTABLE_TOKEN;
 
-  console.log('Sending to Airtable:', { email, accessToken, refreshToken });
+  console.log("Sending to Airtable:", { email, accessToken, refreshToken });
 
   try {
     const response = await axios.post(
@@ -116,26 +118,26 @@ const storeTokensInAirtable = async (email, accessToken, refreshToken) => {
       {
         fields: {
           Email: email,
-          AccessToken: accessToken, // Ensure tokens are sent
-          RefreshToken: refreshToken, // Ensure tokens are sent
+          ["Access Token"]: accessToken, // Ensure tokens are sent
+          ["Refresh Token"]: refreshToken, // Ensure tokens are sent
         },
       },
       {
         headers: {
           Authorization: `Bearer ${airtableToken}`,
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
       }
     );
-    console.log('Tokens and email saved to Airtable:', response.data);
+    console.log("Tokens and email saved to Airtable:", response);
   } catch (error) {
-    console.error('Error saving tokens to Airtable:', error);
+    console.error("Error saving tokens to Airtable:", error);
   }
 };
 
 // OAuth login flow function
 const connectGoogleCalendar = () => {
-  const oauthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.email&access_type=offline&include_granted_scopes=true`;
+  const oauthUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${redirectUri}&response_type=code&scope=https://www.googleapis.com/auth/calendar.readonly https://www.googleapis.com/auth/userinfo.email&access_type=offline&include_granted_scopes=true&prompt=consent`;
   window.location.href = oauthUrl;
 };
 
