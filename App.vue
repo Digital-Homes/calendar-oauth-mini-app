@@ -91,9 +91,9 @@ const fetchUserEmail = async (accessTokenVal) => {
 
       // Call the function to store tokens in Airtable
       storeTokensInAirtable(
-        userEmail, // The user's email
-        accessToken.value, // Access token
-        refreshToken.value // Refresh token
+        userEmail // The user's email
+        // accessToken.value, // Access token
+        // refreshToken.value // Refresh token
       );
     } else {
       console.error("Tokens are missing or undefined");
@@ -105,10 +105,9 @@ const fetchUserEmail = async (accessTokenVal) => {
 
 // Function to store tokens and email in Airtable
 const storeTokensInAirtable = async (email, accessToken, refreshToken) => {
-  const airtableBaseId = import.meta.VITE_AIRTABLE_BASE_ID;
-  ("");
-  const airtableTableName = import.meta.VITE_TABLE_ID; // calendar data table
-  const airtableToken = import.meta.VITE_AIRTABLE_TOKEN;
+  const airtableBaseId = import.meta.env.VITE_AIRTABLE_BASE_ID;
+  const airtableTableName = import.meta.env.VITE_TABLE_ID; // calendar data table
+  const airtableToken = import.meta.env.VITE_AIRTABLE_TOKEN;
 
   console.log("Sending to Airtable:", { email, accessToken, refreshToken });
 
@@ -118,8 +117,8 @@ const storeTokensInAirtable = async (email, accessToken, refreshToken) => {
       {
         fields: {
           Email: email,
-          ["Access Token"]: accessToken, // Ensure tokens are sent
-          ["Refresh Token"]: refreshToken, // Ensure tokens are sent
+          // ["Access Token"]: accessToken, // Ensure tokens are sent
+          // ["Refresh Token"]: refreshToken, // Ensure tokens are sent
         },
       },
       {
