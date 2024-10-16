@@ -37,7 +37,6 @@ const extractTokenFromUrl = () => {
   const authorizationCode = urlParams.get("code");
 
   if (authorizationCode) {
-    console.log("Authorization Code:", authorizationCode);
     // Exchange the authorization code for access and refresh tokens
     exchangeCodeForTokens(authorizationCode);
   }
@@ -54,14 +53,9 @@ const exchangeCodeForTokens = async (authorizationCode) => {
       grant_type: "authorization_code",
     });
 
-    console.log("Token Response:", response.data);
-
     // Make sure to set the tokens correctly
     accessToken.value = response.data.access_token || "";
     refreshToken.value = response.data.refresh_token || "";
-
-    console.log("Access Token:", accessToken.value);
-    console.log("Refresh Token:", refreshToken.value);
 
     // Fetch the user's email and then store the tokens and email in Airtable
     fetchUserEmail(accessToken.value);
@@ -83,12 +77,9 @@ const fetchUserEmail = async (accessTokenVal) => {
     );
 
     const userEmail = response.data.email;
-    console.log("User Email:", userEmail);
 
     // Ensure the tokens are valid before storing them in Airtable
     if (accessToken.value && refreshToken.value) {
-      console.log("Storing tokens in Airtable...");
-
       // Call the function to store tokens in Airtable
       storeTokensInAirtable(
         userEmail, // The user's email
@@ -109,8 +100,6 @@ const storeTokensInAirtable = async (email, accessToken, refreshToken) => {
   const airtableTableName = import.meta.env.VITE_TABLE_ID; // calendar data table
   const airtableToken = import.meta.env.VITE_AIRTABLE_TOKEN;
 
-  console.log("Sending to Airtable:", { email, accessToken, refreshToken });
-
   try {
     const response = await axios.post(
       `https://api.airtable.com/v0/${airtableBaseId}/${airtableTableName}`,
@@ -128,7 +117,6 @@ const storeTokensInAirtable = async (email, accessToken, refreshToken) => {
         },
       }
     );
-    console.log("Tokens and email saved to Airtable:", response);
   } catch (error) {
     console.error("Error saving tokens to Airtable:", error);
   }
